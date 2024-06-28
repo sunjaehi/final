@@ -23,7 +23,7 @@ function NoticeDetail() {
     }, [])
     return (
         <Container maxWidth="sm">
-            {notice && (<Typography variant="h6" sx={{ marginTop: 8 }}>{notice.title}</Typography>)}
+            {notice && (<Typography variant="body1" sx={{ marginTop: 8 }}>{notice.title}</Typography>)}
             {/* {notice && (<p>{notice.author}</p>)} */}
             <Box sx={{ display: 'flex', justifyContent: ' space-between', alignItems: 'center' }}>
                 {notice && (<Typography variant="body1" sx={{ marginTop: 2, marginBottom: 1 }}>{notice.createdAt}</Typography>)}

@@ -214,7 +214,7 @@ function Servicecenter() {
                 />
                 <TextField
                     id="shopPhone"
-                    label="연락처"
+                    label="가게 연락처"
                     multiline
                     fullWidth
                     value={inputItem.shopPhone}

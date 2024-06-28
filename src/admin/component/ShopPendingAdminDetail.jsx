@@ -97,6 +97,33 @@ export default function ShopPendingAdminDetail() {
         }
     };
 
+    const reject = async () => {
+        const requestBody = {
+            id: shopId,
+            reason: shopInfo.rejectReason // Assuming you have a field for reject reason
+        };
+
+        try {
+            const response = await fetch(`${backend}/api/v1/shop-pending/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (response.ok) {
+                alert('가게가 성공적으로 반려되었습니다.');
+                navigate('/shop-pending-manage');
+            } else {
+                alert('가게 반려에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('가게 반려 중 오류가 발생했습니다.');
+        }
+    };
+
     return (
         <Box sx={{ display: "flex", flexDirection: "row", padding: 3 }}>
             <Adminlist />
@@ -266,7 +293,7 @@ export default function ShopPendingAdminDetail() {
                         <Stack direction="row-reverse" gap={2}>
                             {shopInfo.status === 'PENDING' && (
                                 <>
-                                    <Button variant="contained" color="warning">등록 반려</Button>
+                                    <Button variant="contained" color="warning" onClick={reject}>등록 반려</Button>
                                     <Button variant="contained" onClick={accept}>수정 및 등록</Button>
                                 </>
                             )}
@@ -280,6 +307,7 @@ export default function ShopPendingAdminDetail() {
                     </Stack>
                 )}
             </Box>
-        </Box >
+        </Box>
     );
 }
+

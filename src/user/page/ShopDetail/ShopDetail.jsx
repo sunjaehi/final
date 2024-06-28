@@ -59,6 +59,7 @@ function ShopDetail() {
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+    const isAdmin = sessionStorage.getItem('role') === 'ROLE_ADMIN';
 
     useEffect(() => {
         Kakao.cleanup();
@@ -91,9 +92,12 @@ function ShopDetail() {
         }
     }
     const handleChange = (event, newValue) => {
-        /*3번 인덱스인 소식을 눌렀을 경우 탭 전환 방지*/
+        /*3,4번 인덱스인 소식 관리 버튼을 눌렀을 경우 탭 전환 방지*/
         if (newValue === 3) {
             setDrawerOpen(true);
+            return;
+        } else if (newValue === 4) {
+            navigate(`/shopAdminDetail/${shopId}`);
             return;
         }
         setValue(newValue);
@@ -309,6 +313,11 @@ function ShopDetail() {
     return (
         <Container maxWidth="sm" sx={{ marginTop: '80px' }}>
             <div>
+                {datas && datas.isAvailable === 0 && (
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        지정해제된 가게입니다. 일부 데이터가 부정확할 수 있습니다.
+                    </Alert>
+                )}
                 {datas && <Card sx={{ width: '100%' }}>
                     <Carousel autoPlay={false} animation="slide" timeout={1000} >
                         {datas.shopImgUrls.length > 0 ? datas.shopImgUrls.map(url =>
@@ -386,8 +395,8 @@ function ShopDetail() {
                             <Tab label="지도" />
                             <Tab label="기타 정보" />
                             <Tab label="소식" />
+                            {isAdmin && <Tab label="가게 관리" />}
                         </Tabs>
-
                         <CustomTabPanel value={value} index={0}>
                             <Typography>주소</Typography>
                             <Typography variant="body2" color="text.secondary">{datas.address}</Typography>

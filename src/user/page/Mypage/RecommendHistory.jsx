@@ -62,11 +62,24 @@ export default function RecommendHistory() {
         navigate(`/detail/${shopId}`);
     };
 
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     return (
-        <Container>
+        <Container maxWidth="sm" sx={{ paddingTop: '16px' }}>
             <Typography variant="h5" gutterBottom align="center" sx={{ fontSize: '1.25rem' }}>
                 추천 내역
             </Typography>
+            <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleBack}
+                fullWidth
+                sx={{ marginBottom: 2 }}
+            >
+                뒤로 가기
+            </Button>
             {shops.length === 0 ? (
                 <Box
                     sx={{

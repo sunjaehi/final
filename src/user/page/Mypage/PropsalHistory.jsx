@@ -6,6 +6,8 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@mui/material';
 
 const backend = process.env.REACT_APP_BACKEND_ADDR;
 
@@ -13,6 +15,14 @@ export default function ProposalHistory() {
     const [proposals, setProposals] = useState([]);
     const [details, setDetails] = useState({});
     const accessToken = sessionStorage.getItem('atk');
+    const [sectors, setSectors] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        fetch(`${backend}/api/v1/sector/`)
+            .then(response => response.json())
+            .then(json => setSectors(json));
+    }, []);
 
     useEffect(() => {
         fetch(`${backend}/api/v1/proposal/list`, {
@@ -38,12 +48,30 @@ export default function ProposalHistory() {
         }
     };
 
+    const getSectorName = (sectorId) => {
+        const sector = sectors.find(sector => sector.id === sectorId);
+        return sector ? sector.name : 'Unknown';
+    };
+
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     return (
-        <Container maxWidth="sm" sx={{ marginTop: '72px' }}>
-            <Box mt={5}>
+        <Container maxWidth="sm" sx={{ paddingTop: '16px' }}>
+            <Box>
                 <Typography variant="h6" gutterBottom>
                     착한 가게로 등록 요청한 내역들이에요
                 </Typography>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleBack}
+                    fullWidth
+                    sx={{ marginBottom: 2 }}
+                >
+                    뒤로 가기
+                </Button>
                 {proposals.map((proposal) => (
                     <Accordion key={proposal.id} onChange={handleAccordionChange(proposal.id)}>
                         <AccordionSummary
@@ -65,9 +93,10 @@ export default function ProposalHistory() {
                                     <strong>영업 시간:</strong> {details[proposal.id].businessHours}<br />
                                     <strong>기타 정보:</strong> {details[proposal.id].info}<br />
                                     <strong>요청 사유:</strong> {details[proposal.id].reason}<br />
-                                    <strong>Sector ID:</strong> {details[proposal.id].sectorId}<br />
+                                    <strong>업종명:</strong> {getSectorName(details[proposal.id].sectorId)}<br />
                                     <strong>우편번호:</strong> {details[proposal.id].zipcode}<br />
                                     <strong>상태:</strong> {details[proposal.id].status}<br />
+                                    <strong>처리내용:</strong> {details[proposal.id].memo}<br />
                                 </Typography>
                             ) : (
                                 <Typography>Loading...</Typography>

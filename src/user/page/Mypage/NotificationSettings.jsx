@@ -31,7 +31,10 @@ const NotificationSettings = () => {
         setPushNotifications(!pushNotifications);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
+        if (window.isFlutterInAppWebView) {
+            window.flutter_inappwebview.callHandler('saveNotificationSettings');
+        }
         fetch(`${backend}/api/v1/member/change-notification-setting`, {
             method: 'PATCH',
             headers: {
@@ -85,7 +88,7 @@ const NotificationSettings = () => {
                         />
                     </Box>
                     <Typography variant="body2" color="textSecondary">
-                        이메일 알림을 설정하면 <br />관심 지역 가게 알림을 받을 수 있습니다.
+                        이메일 알림을 설정하면 <br />뉴스레터를 받아볼 수 있습니다.
                     </Typography>
                 </Grid>
                 <Grid item xs={12}>

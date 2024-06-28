@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, List, ListItem, ListItemText, Typography, Box, Rating } from "@mui/material";
+import { Container, List, ListItem, ListItemText, Typography, Box, Rating, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const backend = process.env.REACT_APP_BACKEND_ADDR;
@@ -28,11 +28,24 @@ export default function ReviewHistory() {
         navigate(`/review/${shopId}`);
     };
 
+    const handleBack = () => {
+        navigate(-1);
+    };
+
     return (
-        <Container>
-            <Typography variant="h5" gutterBottom align="center" sx={{ fontSize: '1.25rem', marginTop: 4 }}>
+        <Container maxWidth="sm" sx={{ paddingTop: '16px' }}>
+            <Typography variant="h5" gutterBottom align="center" sx={{ fontSize: '1.25rem' }}>
                 나의 리뷰 내역
             </Typography>
+            <Button
+                variant="outlined"
+                color="primary"
+                onClick={handleBack}
+                fullWidth
+                sx={{ marginBottom: 2 }}
+            >
+                뒤로 가기
+            </Button>
             {reviews.length === 0 ? (
                 <Box
                     sx={{

@@ -19,7 +19,6 @@ export default function ProposalAdminDetail() {
     const [sectors, setSectors] = useState([]);
     const [selectedSector, setSelectedSector] = useState("");
     const [boast, setBoast] = useState("");
-    const [memo, setMemo] = useState("");
     const [isLocalFranchise, setIsLocalFranchise] = useState(0);
 
     useEffect(() => {
@@ -36,13 +35,7 @@ export default function ProposalAdminDetail() {
         Promise.all([fetchSector, fetchData]).then(([sectorsData, shopData]) => {
             if (shopData) {
                 setShopInfo(shopData);
-                if (shopData.businessHours === "00:00 - 24:00") {
-                    setIs24Hours(true);
-                } else if (shopData.businessHours) {
-                    const [start, end] = shopData.businessHours.split('-');
-                    setStartTime(dayjs().hour(Number(start.split(':')[0])).minute(Number(start.split(':')[1])));
-                    setEndTime(dayjs().hour(Number(end.split(':')[0])).minute(Number(end.split(':')[1])));
-                }
+                initializeBusinessHours(shopData.businessHours);
                 setSelectedSector(shopData.sectorId);
                 setIsLocalFranchise(shopData.isLocalFranchise ? 1 : 0);
             }
@@ -50,11 +43,21 @@ export default function ProposalAdminDetail() {
         });
     }, [id, navigate]);
 
+    const initializeBusinessHours = (businessHours) => {
+        if (businessHours === "00:00 - 24:00") {
+            setIs24Hours(true);
+        } else if (businessHours) {
+            const [start, end] = businessHours.split('-');
+            setStartTime(dayjs().hour(Number(start.split(':')[0])).minute(Number(start.split(':')[1])));
+            setEndTime(dayjs().hour(Number(end.split(':')[0])).minute(Number(end.split(':')[1])));
+        }
+    };
+
     const navigateToMainadmin = () => {
         navigate("/Mainadmin");
     };
 
-    const approveProposal = () => {
+    const handleProposalAction = (action) => {
         const businessHours = is24Hours ? `00:00 - 24:00` : `${startTime.format('HH:mm')} - ${endTime.format('HH:mm')}`;
         const updatedShopInfo = {
             id: shopInfo.id,
@@ -62,45 +65,36 @@ export default function ProposalAdminDetail() {
             info: shopInfo.info,
             businessHours: businessHours,
             boast: boast,
-            memo: memo,
+            memo: shopInfo.memo,
             isLocalFranchise: isLocalFranchise
         };
 
-        fetch(`${backend}/api/v1/proposal/approval`, {
+        let url;
+        let body;
+
+        if (action === "approve") {
+            url = `${backend}/api/v1/proposal/approval`;
+            body = JSON.stringify(updatedShopInfo);
+        } else if (action === "approveUnregistered") {
+            url = `${backend}/api/v1/proposal/approval-unregistered`;
+            body = JSON.stringify(updatedShopInfo);
+        } else {
+            url = `${backend}/api/v1/proposal/reject`;
+            body = JSON.stringify({ id: shopInfo.id, memo: shopInfo.memo });
+        }
+
+        fetch(url, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(updatedShopInfo)
+            body: body
         })
             .then(response => {
                 if (response.status === 200) {
-                    alert('승인 완료');
+                    alert(action === "approve" ? '승인 완료' : action === "approveUnregistered" ? '승인(미등록) 완료' : '반려 완료');
                 } else {
-                    alert('승인 실패');
-                }
-            });
-    };
-
-    const rejectProposal = () => {
-        const rejectData = {
-            id: shopInfo.id,
-            memo: memo
-        };
-
-
-        fetch(`${backend}/api/v1/proposal/reject`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(rejectData)
-        })
-            .then(response => {
-                if (response.status === 200) {
-                    alert('반려 완료');
-                } else {
-                    alert('반려 실패');
+                    alert(action === "approve" ? '승인 실패' : action === "approveUnregistered" ? '승인(미등록) 실패' : '반려 실패');
                 }
             });
     };
@@ -179,11 +173,11 @@ export default function ProposalAdminDetail() {
                         onChange={(e) => setBoast(e.target.value)}
                     />
                     <TextField
-                        label="메모"
+                        label="처리내용"
                         multiline
                         variant="outlined"
-                        value={memo}
-                        onChange={(e) => setMemo(e.target.value)}
+                        value={shopInfo.memo}
+                        onChange={(e) => setShopInfo({ ...shopInfo, memo: e.target.value })}
                     />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <Stack direction="row" spacing={2} alignItems="center">
@@ -237,7 +231,8 @@ export default function ProposalAdminDetail() {
                                 backgroundColor: "black",
                                 ":hover": { backgroundColor: "grey" }
                             }}
-                            onClick={approveProposal}
+                            onClick={() => handleProposalAction("approve")}
+                            disabled={shopInfo.status !== "PENDING"}
                         >
                             승인
                         </Button>
@@ -249,7 +244,21 @@ export default function ProposalAdminDetail() {
                                 backgroundColor: "black",
                                 ":hover": { backgroundColor: "grey" }
                             }}
-                            onClick={rejectProposal}
+                            onClick={() => handleProposalAction("approveUnregistered")}
+                            disabled={shopInfo.status !== "PENDING"}
+                        >
+                            승인(미등록)
+                        </Button>
+                        <Button
+                            variant="contained"
+                            sx={{
+                                mr: '10px',
+                                borderRadius: "15px",
+                                backgroundColor: "black",
+                                ":hover": { backgroundColor: "grey" }
+                            }}
+                            onClick={() => handleProposalAction("reject")}
+                            disabled={shopInfo.status !== "PENDING"}
                         >
                             반려
                         </Button>

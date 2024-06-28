@@ -2,9 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Adminlist from "../section/Adminlist";
 import { Box, Divider, TextField, Button, Stack } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import FormGroup from '@mui/material/FormGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import AddIcon from '@mui/icons-material/Add';
 
 const backend = process.env.REACT_APP_BACKEND_ADDR;
@@ -34,7 +31,6 @@ export default function NoticeAdminEdit() {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [previews, setPreviews] = useState([]);
     const [deletedFiles, setDeletedFiles] = useState([]);
-    const [isImportant, setIsImportant] = useState(false);
     const formData = new FormData();
 
     const [formItem, setFormItem] = useState({
@@ -128,12 +124,6 @@ export default function NoticeAdminEdit() {
                             ":hover": { backgroundColor: "lightgrey" }
                         }} onClick={navigateToMainadmin}>취소</Button>
                     </Stack>
-                    <FormGroup>
-                        <FormControlLabel control={
-                            <Checkbox checked={isImportant} onChange={() => setIsImportant(!isImportant)} />
-                        } label="중요 (이 항목을 체크하면 사용자에게 PUSH알림이 전송됩니다)" />
-                    </FormGroup>
-
                 </Box>
                 <>
                     <input
@@ -177,9 +167,7 @@ export default function NoticeAdminEdit() {
                         </div>
                     ))}
                 </div>
-
             </Box>
         </form>
-
     );
 }

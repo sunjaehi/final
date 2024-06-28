@@ -62,7 +62,7 @@ function Myregion() {
 
     return (
         <Container maxWidth="sm">
-            <Box display="flex" flexDirection="column" alignItems="center" textAlign="center">
+            <Box display="flex" flexDirection="column" alignItems="center" textAlign="center" sx={{ paddingTop: '16px' }}>
                 <Typography variant="h5" gutterBottom>
                     관심 지역 설정
                 </Typography>

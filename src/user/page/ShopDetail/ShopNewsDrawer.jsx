@@ -37,7 +37,8 @@ const Puller = styled('div')(({ theme }) => ({
 const ShopNewsDrawer = ({ open, onClose, onOpen, shopNewsDatas, fetchMoreData }) => {
     const observerRef = useRef();
     const theme = useTheme();
-    const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+    const isMobileOrTablet = useMediaQuery(theme.breakpoints.down('md'));
+    const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -66,16 +67,16 @@ const ShopNewsDrawer = ({ open, onClose, onOpen, shopNewsDatas, fetchMoreData })
             open={open}
             onClose={onClose}
             onOpen={onOpen}
-            swipeAreaWidth={isSmallScreen ? drawerBleeding : 0}
+            swipeAreaWidth={isMobileOrTablet ? drawerBleeding : 0}
             disableSwipeToOpen={false}
             ModalProps={{
                 keepMounted: true,
             }}
             PaperProps={{
                 sx: {
-                    height: `calc(80% - ${isSmallScreen ? drawerBleeding : 0}px)`,
+                    height: `calc(80% - ${isMobileOrTablet ? drawerBleeding : 0}px)`,
                     overflow: 'visible',
-                    maxWidth: isSmallScreen ? '100%' : theme.breakpoints.values.sm,
+                    maxWidth: isDesktop ? theme.breakpoints.values.sm : '100%',
                     margin: '0 auto',
                 },
             }}
@@ -83,19 +84,24 @@ const ShopNewsDrawer = ({ open, onClose, onOpen, shopNewsDatas, fetchMoreData })
             <StyledBox
                 sx={{
                     position: 'absolute',
-                    top: isSmallScreen ? -drawerBleeding : 0,
-                    borderTopLeftRadius: 8,
-                    borderTopRightRadius: 8,
+                    top: isMobileOrTablet ? -drawerBleeding : 10,
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
                     visibility: 'visible',
                     right: 0,
                     left: 0,
                 }}
             >
-                {isSmallScreen && <Puller />}
+                <Puller />
                 <Typography sx={{ p: 2, color: 'text.secondary' }}>가게 소식</Typography>
             </StyledBox>
             <StyledBox
                 sx={{
+                    position: 'absolute',
+                    top: isMobileOrTablet ? 0 : drawerBleeding,
+                    borderTopLeftRadius: 16,
+                    borderTopRightRadius: 16,
+                    visibility: 'visible',
                     px: 2,
                     pb: 2,
                     height: '100%',
@@ -103,7 +109,7 @@ const ShopNewsDrawer = ({ open, onClose, onOpen, shopNewsDatas, fetchMoreData })
                 }}
             >
                 {shopNewsDatas.length === 0 ? (
-                    <Typography sx={{ p: 2, color: 'text.secondary' }}>아직 가게 소식이 없어요</Typography>
+                    <Typography sx={{ color: 'text.secondary' }}>아직 가게 소식이 없어요</Typography>
                 ) : (
                     shopNewsDatas.map((news, index) => (
                         <Card key={index} sx={{ mb: 2 }}>
@@ -129,7 +135,7 @@ const ShopNewsDrawer = ({ open, onClose, onOpen, shopNewsDatas, fetchMoreData })
                 )}
                 <div ref={observerRef} />
             </StyledBox>
-        </SwipeableDrawer>
+        </SwipeableDrawer >
     );
 };
 
